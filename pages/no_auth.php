@@ -1,13 +1,29 @@
 <?php
-if(isset($_GET['auth']))
-{
-include_once 'inc/auth.php';
-}
+require_once './sys/connect.php';
+
+$errors = [];
+
+if(isset[$_POST['ok']]){
+    if(empty($_POST['userName'] && $_POST['password'] && $_POST['password2'])){
+        $errors[] = 'Все поля обязательны для заполнения';
+    }
+    if($_POST['password'] != $_POST['password2']){
+        $errors[] = 'Введённые пароли не совпадают';
+    }
+    $query = $connect->prepare('SELECT COUNT(*) FROM `users` WHERE `nick` = :nick AND `password` = :password');
+    $query->execute(['nick' => $_POST['userName'],
+                     'password' => md5($_POST['password']) ]);
+    $data = $query->fetchColumn(); 
+    if($data == 1){
+        $_SESSION = $_POST['nick'];
+        header('Location: ../pages/Shop.php'); 
+    }else{
+        echo 'Неверный логин или пароль';
+    }
 if(isset($_GET['regi']))
 {
 include_once 'inc/registration.php';
 }
-var_dump($ku);
 ?>
 
          <form name="formReg" action="/?registration.php" method="POST">
